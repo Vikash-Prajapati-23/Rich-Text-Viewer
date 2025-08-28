@@ -1,28 +1,35 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+
 
 const TextEditor = () => {
   const [text, setText] = useState("");
 
-  const handleChange = (event) => {
-    setText(event.target.value)
-  }
+  const handleChange = (value) => {
+    setText(value);
+  };
 
   return (
-    <div className="h-screen w-full flex flex-col justify-center items-center ">
-      <h1 className="text-4xl font-bold ">Rich Text Viwer</h1>
+    <div className="w-full lg:max-w-4xl md:max-w-2xl max-w-full mx-auto px-4">
+      <h1 className="text-4xl text-center font-bold my-5">Rich Text Viwer</h1>
 
       <div>
-        <p>Paste your text here.!</p>
-        <textarea
-          className="border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded py-1 px-2"
-          placeholder="Type something."
+        <p className="my-3">Paste your text here.</p>
+        <ReactQuill
+          theme="snow"
+          className="h-40 border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded w-full"
+          placeholder="Type something.."
           value={text}
           onChange={handleChange}
-          cols="140"
-          rows="7"
-          id=""
-        ></textarea>
+        />
+      </div>
 
+      <div className="text-start mt-14 mb-5">
+        <span className="font-semibold ">Your text summary.</span>
+        <p> {`${text.length} words & ${text.length} characters.`} </p>
+
+        <span className="font-semibold ">Your text preview.</span>
         <p> {text} </p>
       </div>
     </div>
