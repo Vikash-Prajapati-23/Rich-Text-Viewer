@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
+import { toast } from "sonner";
 
 const TextEditor = () => {
   const [text, setText] = useState("");
@@ -23,12 +24,22 @@ const TextEditor = () => {
   const charCount = plainText.length;
 
   const handleUpperCase = () => {
-    const newText = text.toUpperCase();
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
+    const newText = text.toUpperCase(); // Convert to Upper case.
+    toast.success("Text has been converted to upper case successfully!");
     setText(newText);
   };
 
   const handleLowerCase = () => {
-    const newText = text.toLowerCase();
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
+    const newText = text.toLowerCase(); // Convert to Lower case.
+    toast.success("Text has been converted to lower case successfully!");
     setText(newText);
   };
 
@@ -41,31 +52,110 @@ const TextEditor = () => {
     // .writeText(text)
     // A method of navigator.clipboard.
     // Takes a string (text) as input and copies it into the system clipboard.
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
     navigator.clipboard.writeText(plainText);
+    toast.success("Text has been copied successfully!");
   };
 
   const handleClearText = () => {
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
     setText("");
+    toast.success("Text has been cleared successfully!");
+  };
+
+  const convertCamelCase = () => {
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
+    let newText = text
+      .split(" ")
+      .map((word) =>
+        word.length > 0 ? word[0].toUpperCase() + word.slice(1) : ""
+      )
+      .join(" ");
+    setText(newText);
+    toast.success("Text converted to camelCase!");
+  };
+  // First we split the sentence into a array then iterate each word and convert their first character. Then join them back.
+
+  const convertSnakeCase = () => {
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
+    setSnakeCase(true);
+    let newText = text.split(" ").join("_");
+    setText(newText);
+  };
+
+  const removeSnakeCase = () => {
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
+    setSnakeCase(false);
+    const newText = text.replace(/_/g, " ");
+    setText(newText);
+    toast.success("Snake case removed!");
+  };
+
+  const [snakecase, setSnakeCase] = useState(false);
+  const convertPascalCase = () => {
+    if (plainText === "") {
+      toast.error("Type something first.");
+      return;
+    }
+    let newText;
+    if (snakecase === false) {
+      newText = text
+        .split(" ")
+        .map((word) =>
+          word.length > 0 ? word[0].toUpperCase() + word.slice(1) : ""
+        )
+        .join("");
+    } else {
+      newText = text
+        .split("_")
+        .map((word) =>
+          word.length > 0 ? word[0].toUpperCase() + word.slice(1) : ""
+        )
+        .join("");
+    }
+    setText(newText);
   };
 
   const handleRandomQuotes = async () => {
     try {
+      // Fetching data from API using async & await to generate random quotes.
       const response = await fetch("https://dummyjson.com/quotes/random", {
         method: "GET",
       });
       const data = await response.json();
-      const randomQuote = `"${data.quote}" - ${data.author}`;
+      const randomQuote = `“${data.quote}” - ${data.author}`;
       setText(randomQuote);
+      toast.success("Random quote generated Successfully!");
     } catch (error) {
-      console.error("Error", error);
+      toast.error("Failed to generate quote!");
     }
-  }
+  };
+
+  let readTime = () => {
+    let time = 0.008 * plainText.split(/\s+/).length;
+    return parseFloat(time.toFixed(2));
+  };
 
   return (
     <div className="w-full lg:max-w-4xl md:max-w-2xl max-w-full mx-auto px-4">
       <h1 className="text-4xl text-center font-bold my-5">Rich Text Viwer</h1>
 
-      <div>
+      <div className="mb-14">
         <p className="my-3">Paste your text here.</p>
         {/* Using React quill. */}
         <ReactQuill
@@ -77,7 +167,7 @@ const TextEditor = () => {
         />
       </div>
 
-      <div className="mt-14 flex gap-3">
+      <div className="space-x-2 space-y-2 ">
         <button
           onClick={() => handleUpperCase()}
           className="bg-blue-500 cursor-pointer duration-150 ease-in-out hover:bg-blue-600 text-white py-1 px-2 rounded "
@@ -103,8 +193,32 @@ const TextEditor = () => {
           Clear text
         </button>
         <button
-          onClick={() => handleRandomQuotes()}
+          onClick={() => convertCamelCase()}
           className="bg-blue-500 cursor-pointer duration-150 ease-in-out hover:bg-blue-600 text-white py-1 px-2 rounded "
+        >
+          Camel case
+        </button>
+        <button
+          onClick={() => convertSnakeCase()}
+          className="bg-blue-500 cursor-pointer duration-150 ease-in-out hover:bg-blue-600 text-white py-1 px-2 rounded "
+        >
+          Snake case
+        </button>
+        <button
+          onClick={() => removeSnakeCase()}
+          className="bg-blue-500 cursor-pointer duration-150 ease-in-out hover:bg-blue-600 text-white py-1 px-2 rounded "
+        >
+          Remove snake case
+        </button>
+        <button
+          onClick={() => convertPascalCase()}
+          className="bg-blue-500 cursor-pointer duration-150 ease-in-out hover:bg-blue-600 text-white py-1 px-2 rounded "
+        >
+          Pascal case
+        </button>
+        <button
+          onClick={() => handleRandomQuotes()}
+          className="bg-purple-500 cursor-pointer duration-150 ease-in-out hover:bg-purple-600 text-white py-1 px-2 rounded "
         >
           Generate random quote
         </button>
@@ -118,7 +232,8 @@ const TextEditor = () => {
           </p>
           ||
           <p>
-            {wordCount * 0.008} <b>minutes</b> to read the whole text.
+            It will take around <b>{readTime()}</b> minuts to read the above
+            content.
           </p>
         </span>
 
