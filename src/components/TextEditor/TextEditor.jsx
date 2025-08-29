@@ -48,6 +48,19 @@ const TextEditor = () => {
     setText("");
   };
 
+  const handleRandomQuotes = async () => {
+    try {
+      const response = await fetch("https://dummyjson.com/quotes/random", {
+        method: "GET",
+      });
+      const data = await response.json();
+      const randomQuote = `"${data.quote}" - ${data.author}`;
+      setText(randomQuote);
+    } catch (error) {
+      console.error("Error", error);
+    }
+  }
+
   return (
     <div className="w-full lg:max-w-4xl md:max-w-2xl max-w-full mx-auto px-4">
       <h1 className="text-4xl text-center font-bold my-5">Rich Text Viwer</h1>
@@ -88,6 +101,12 @@ const TextEditor = () => {
           className="bg-blue-500 cursor-pointer duration-150 ease-in-out hover:bg-blue-600 text-white py-1 px-2 rounded "
         >
           Clear text
+        </button>
+        <button
+          onClick={() => handleRandomQuotes()}
+          className="bg-blue-500 cursor-pointer duration-150 ease-in-out hover:bg-blue-600 text-white py-1 px-2 rounded "
+        >
+          Generate random quote
         </button>
       </div>
 
