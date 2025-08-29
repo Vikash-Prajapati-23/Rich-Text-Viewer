@@ -155,7 +155,7 @@ const TextEditor = () => {
     <div className="w-full lg:max-w-4xl md:max-w-2xl max-w-full mx-auto px-4">
       <h1 className="text-4xl text-center font-bold my-5">Rich Text Viwer</h1>
 
-      <div className="mb-14">
+      <div className="md:mb-14 mb-20">
         <p className="my-3">Paste your text here.</p>
         {/* Using React quill. */}
         <ReactQuill
